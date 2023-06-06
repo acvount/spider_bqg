@@ -7,6 +7,9 @@ from util.proxy.proxy_lib import *
 
 
 class Request:
+    headers = {}
+
+
     def __init__(self, headers=None, proxy: Proxy = None, ip_cache=None):
         self.log = Log()
         self._add_new_user_agent()
