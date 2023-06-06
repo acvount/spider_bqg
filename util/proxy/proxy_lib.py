@@ -1,6 +1,6 @@
 import hashlib
 
-from util.request import Request
+
 
 
 class Proxy:
@@ -60,6 +60,7 @@ class JvLiang(Proxy):
 
     def __init__(self, jl_param: JvLiangParams = None, trade_no: str = None, key: str = None):
         self.jl_param = jl_param
+        from util.request import Request
         self.req = Request()
         self.trade_no = trade_no
         self.key = key
