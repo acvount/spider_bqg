@@ -1,7 +1,7 @@
 import time
 import pymysql
-from color_log import Log
-from key_map import KeyMap
+from util.color_log import Log
+from util.key_map import KeyMap
 import threading
 
 
@@ -63,11 +63,19 @@ class Database:
         except pymysql.err.InternalError:
             self.log.sql(sql)
 
-    # noinspection SqlDialectInspection
-    def execute_insert(self, table, obj):
+    def execute_insert(self, table, obj, write_to_file = False):
         cols = ', '.join(obj.keys())
         vals = ', '.join([f"'{value.replace(KeyMap.del_str, KeyMap.none_str)}'"
                           if isinstance(value, str) and value != 'now()' and 'select' not in value
                           else str(value) for value in obj.values()])
         sql = f"INSERT INTO {table} ({cols}) VALUES ({vals})"
-        self.execute_non_query(sql)
+        self.execute_non_query(sql,write_to_file=write_to_file)
+
+    def execute_insert_by_index_column_not_repeat(self, table, obj, index_column, write_to_file=False):
+        index_value = obj[index_column]
+        sql = f"SELECT COUNT(*) AS c FROM {table} WHERE {index_column} = '{index_value}'"
+        count = self.execute_query(sql)[0]['c']
+        if count == 0:
+            self.execute_insert(table,obj,write_to_file=write_to_file)
+        else:
+            self.log.error(f'The record already exists in the table {table} and the index column is {index_column} and the index value is {index_value}')

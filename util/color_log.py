@@ -5,12 +5,11 @@ import threading
 
 class Log:
     def __init__(self):
-        self.local_logger = threading.local()  # 创建线程专属的 Logger 对象
-
-        self.logger = logging.getLogger(__name__)  # 创建实例的 Logger 对象
+        self.local_logger = threading.local()
+        self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
         self.formatter = colorlog.ColoredFormatter(
-            '%(asctime)s - %(log_color)s%(levelname)s - %(message)s',
+            '%(log_color)s%(asctime)s \t %(levelname)s \t:\t%(message)s',
             log_colors={
                 'DEBUG': 'reset',
                 'INFO': 'purple',
@@ -21,15 +20,19 @@ class Log:
             reset=True,
             style='%'
         )
-        self.console_handler = logging.StreamHandler()
-        self.console_handler.setFormatter(self.formatter)
-        self.logger.addHandler(self.console_handler)
+        self._create_console_handler()
+
+    def _create_console_handler(self):
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(self.formatter)
+        self.local_logger.console_handler = console_handler
 
     def _get_thread_logger(self):
-        if not hasattr(self.local_logger, 'logger'):  # 每个线程使用独立的 Logger 对象
-            self.local_logger.logger = logging.getLogger(__name__)
-            self.local_logger.logger.setLevel(logging.INFO)
-            self.local_logger.logger.addHandler(self.console_handler)
+        if not hasattr(self.local_logger, 'logger'):
+            logger = logging.getLogger(__name__)
+            logger.setLevel(logging.INFO)
+            logger.addHandler(self.local_logger.console_handler)
+            self.local_logger.logger = logger
         return self.local_logger.logger
 
     def info(self, info):
@@ -42,4 +45,4 @@ class Log:
 
     def sql(self, info):
         logger = self._get_thread_logger()
-        logger.debug(info)
+        logger.info(info)
