@@ -71,11 +71,11 @@ class Database:
         sql = f"INSERT INTO {table} ({cols}) VALUES ({vals})"
         self.execute_non_query(sql,write_to_file=write_to_file)
 
-    def execute_insert_by_index_column_not_repeat(self, table, obj, index_column, write_to_file=False):
-        index_value = obj[index_column]
-        sql = f"SELECT COUNT(*) AS c FROM {table} WHERE {index_column} = '{index_value}'"
+    def execute_insert_by_index_column_not_repeat(self, table, obj, *args, write_to_file=False):
+        conditions = " AND ".join([f"{column} = '{obj[column]}'" for column in args])
+        sql = f"SELECT COUNT(*) AS c FROM {table} WHERE {conditions}"
         count = self.execute_query(sql)[0]['c']
         if count == 0:
-            self.execute_insert(table,obj,write_to_file=write_to_file)
+            self.execute_insert(table, obj, write_to_file=write_to_file)
         else:
-            self.log.error(f'The record already exists in the table {table} and the index column is {index_column} and the index value is {index_value}')
+            self.log.error(f'The record already exists in the table {table} and the index columns are {args} and the index values are {", ".join([obj[column] for column in args])}')
