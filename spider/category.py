@@ -23,12 +23,10 @@ class Category:
 
     def generate_category_data(self, source):
         content = self.request.get_request(source['home']).text
-        category_list = []
         type_mapping = {
             1: self.XiangShuCategory().get_list_from_bs_object
         }
-        for type_value in type_mapping:
-            category_list = type_mapping[type_value](BeautifulSoup(content, 'html.parser'))
+        category_list = type_mapping[source['type']](BeautifulSoup(content, 'html.parser'))
 
         db_client = Database(db='bookstore', user='root', pwd='123456', host='localhost')
         for category in category_list:
