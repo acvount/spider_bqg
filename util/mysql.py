@@ -79,3 +79,9 @@ class Database:
             self.execute_insert(table, obj, write_to_file=write_to_file)
         else:
             self.log.error(f'The record already exists in the table {table} and the index columns are {args} and the index values are {", ".join([obj[column] for column in args])}')
+
+    def execute_update_by_column_value(self, table, column_value_map, condition_map):
+        set_values = ", ".join([f"{column} = '{new_value}'" for column, new_value in column_value_map.items()])
+        conditions = " AND ".join([f"{column} = '{value}'" for column, value in condition_map.items()])
+        sql = f"UPDATE {table} SET {set_values} WHERE {conditions}"
+        self.execute_non_query(sql)

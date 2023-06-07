@@ -7,3 +7,4 @@ colorlog == 6.7.0
 chardet == 5.1.0
 urllib3 == 1.26.7
 oss2 == 2.18.0
+pymongo == 4.3.3

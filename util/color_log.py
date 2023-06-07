@@ -7,7 +7,7 @@ class Log:
     def __init__(self):
         self.local_logger = threading.local()
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
         self.formatter = colorlog.ColoredFormatter(
             '%(log_color)s%(asctime)s \t %(levelname)s \t:\t%(message)s',
             log_colors={
